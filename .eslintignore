@@ -1,3 +1,6 @@
 node_modules
 out
 !.storybook
+public/workbox-bd7e3b9b
+public/workbox-bd7e3b9b.js
+public/sw.js

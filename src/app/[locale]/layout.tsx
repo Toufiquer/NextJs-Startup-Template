@@ -37,6 +37,9 @@ export const metadata: Metadata = {
       url: '/favicon.png',
     },
   ],
+  manifest: '/manifest.json',
+  title: 'Meal Night',
+  description: 'Modern takeaway platform',
 };
 
 export default function RootLayout(props: {
