@@ -1,3 +1,4 @@
+import { Link } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
 
 export async function generateMetadata(props: { params: { locale: string } }) {
@@ -13,5 +14,10 @@ export async function generateMetadata(props: { params: { locale: string } }) {
 }
 
 export default function Index() {
-  return <span>home page</span>;
+  return (
+    <div>
+      <Link href="/menu">Menu</Link>
+      <p>home page</p>
+    </div>
+  );
 }

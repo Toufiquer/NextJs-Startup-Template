@@ -1,4 +1,3 @@
-
 define(['exports'], (function (exports) { 'use strict';
 
     // @ts-ignore
@@ -301,7 +300,6 @@ define(['exports'], (function (exports) { 'use strict';
         url,
         status
       }) => {
-        // eslint-disable-next-line prefer-template
         return `The precaching request for '${url}' failed` + (status ? ` with an HTTP status of ${status}.` : `.`);
       },
       'non-precached-url': ({
