@@ -53,7 +53,7 @@ export default function Layout(props: { children: React.ReactNode }) {
             </a>
           </li>
           <li>  <Link
-              href="/menu"
+              href="/dashboard/menu"
               className="border-none text-gray-700 hover:text-gray-900"
             >
              Menu

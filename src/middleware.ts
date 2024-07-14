@@ -24,7 +24,7 @@ export default async function authMiddleware(req: NextRequest) {
   const currentPath = req.nextUrl.pathname;
   const session = await getSession();
 
-  if (currentPath.includes('/dashboard') && !session.user) {
+  if (currentPath.includes('/dashboard') && Object.keys(session).length===0) {
     return NextResponse.redirect(
       new URL('/sign-in?redirectUrl=/dashboard', req.url),
     );

@@ -19,7 +19,7 @@ export default async function Welcome() {
   const requestToken = generateLoginToken();
  
   if (session && Object.keys(session).length > 0) {
-  redirect('/menu')
+  redirect('/dashboard/menu')
   }
 
   return (
