@@ -6,6 +6,6 @@
 |-----------------------------------------
 */
 const Page= () => {
-return <main className="bg-slate-800 text-white flex items-center justify-center w-full h-screen">Menu</main>;
+return <main className="bg-slate-800 text-white flex items-center justify-center w-full h-screen">Public Menu</main>;
 }
 export default Page

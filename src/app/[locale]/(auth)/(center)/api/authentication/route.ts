@@ -40,7 +40,9 @@ export async function POST(req: NextRequest,res: NextResponse){
           roles: 5,
         };
         session.data = jwtPayload;
+        console.log('before save session : ', session);
         await session.save();
+
 console.log(" response : ", JSON.stringify(response));
         return NextResponse.json(jwtPayload, { status: 200 });
       }
