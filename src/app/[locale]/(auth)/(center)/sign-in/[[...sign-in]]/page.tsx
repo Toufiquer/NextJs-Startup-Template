@@ -1,57 +1,28 @@
 /*
 |-----------------------------------------
-| setting up sign in page
-| @author: Jahid Haque <jahid.haque@yahoo.com>
-| @copyright: daauk, 2024
+| setting up Page for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, July, 2024
 |-----------------------------------------
 */
+import { redirect } from "next/navigation";
 
-import { Link } from 'lucide-react';
-import { getTranslations } from 'next-intl/server';
+//local dependency
+import { generateLoginToken, getIronSessionData } from "@/service/auth";
+import LoginForm from "./login-form";
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+export default async function Welcome() {
+  const session = await getIronSessionData();
+  const requestToken = generateLoginToken();
 
-import LoginForm from './login-form';
+  console.log("from login page, session : ", session);
+  if (session && Object.keys(session).length > 0) {
+    redirect("/dashboard?tkn=124354");
+  }
 
-export async function generateMetadata(props: { params: { locale: string } }) {
-  const t = await getTranslations({
-    locale: props.params.locale,
-    namespace: 'SignIn',
-  });
-
-  return {
-    title: t('meta_title'),
-    description: t('meta_description'),
-  };
-}
-
-export default function SignIn() {
   return (
-    <div className="flex w-full items-center justify-center px-5 py-20 md:px-0">
-      <Card className="w-full md:w-4/12 ">
-        <CardHeader>
-          <CardTitle>Already have an account?</CardTitle>
-          <CardDescription>Log in to your account.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <LoginForm />
-          <div className="mt-3 flex items-center justify-end">
-            <span className={'text-sm font-light text-slate-600'}>Don't have any account?{' '}</span>
-            <Link
-              className="ml-2 text-sm font-medium text-blue-700 underline"
-              href="/sign-up"
-            >
-              Sign up
-            </Link>
-          </div>
-        </CardContent>
-      </Card>
+    <div className={"flex flex-col"}>
+      <LoginForm token={requestToken} />
     </div>
   );
 }

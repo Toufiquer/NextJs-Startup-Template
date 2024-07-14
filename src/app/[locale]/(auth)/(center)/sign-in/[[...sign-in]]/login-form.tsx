@@ -1,143 +1,196 @@
 /*
 |-----------------------------------------
-| setting up login form
+| setting up login form for the app
 | @author: Jahid Haque <jahid.haque@yahoo.com>
-| @copyright: daauk, 2024
+| @copyright: mealnight, 2023
 |-----------------------------------------
 */
+"use client";
+import { useEffect, useState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { Loader2, AlertCircle } from "lucide-react";
+import * as z from "zod";
 
-'use client';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { IError, IProcess } from "@/types/general";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
-import { zodResolver } from '@hookform/resolvers/zod';
-import { AlertCircle, Loader2 } from 'lucide-react';
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import * as z from 'zod';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Button } from '@/components/ui/button';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { useRouter } from 'next/navigation';
 
 const formSchema = z.object({
-  email: z
+  id: z
     .string({
-      required_error: 'Email is required',
+      required_error: "ID is required",
     })
-    .email({
-      message: 'Invalid email address',
-    })
-    .min(3)
-    .max(30),
+    .min(11)
+    .max(11),
   password: z
     .string({
-      required_error: 'Password is required',
+      required_error: "Password is required",
     })
     .min(3)
-    .max(30),
+    .max(10),
+  alias: z
+    .string({
+      required_error: "Alias is required",
+    })
+    .min(2)
+    .max(8),
+  source: z
+    .string({
+      required_error: "Source is required",
+    })
+    .min(2)
+    .max(10),
 });
-export default function LoginForm() {
-  const router = useRouter()
-  const [error, setError] = useState({
+
+export default function LoginForm({ token }: { token: string }) {
+
+  const [process, setProcess] = useState<IProcess>({
     status: false,
-    errFor: '',
-    errMsg: '',
+    processFor: null,
   });
-  const [process, setProcess] = useState(false);
+
+  const [error, setError] = useState<IError>({
+    status: false,
+    errFor: "",
+    errMsg: "",
+  });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: '',
-      password: '',
+      id: "",
+      password: "",
+      alias: "",
+      source: "kitpad",
     },
   });
 
-  const onSubmit = async (formData: z.infer<typeof formSchema>) => {
-    setProcess(true);
+  const onSubmit = async (data: z.infer<typeof formSchema>) => {
 
-    const request = await fetch('/api/authentication', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(formData),
+    setProcess({
+      ...process,
+      status: true,
+      processFor: "login",
     });
-    setProcess(false);
+
+    const request = await fetch("api/authentication", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
+      body: JSON.stringify({
+        id: data.id,
+        password: data.password,
+        alias: data.alias,
+        source: data.source,
+      }),
+    });
 
     const response = await request.json();
-    const { status, data } = response;
-    if (status) {
-      router.push('/');
+
+    console.log("response login form: ", response);
+
+    if (request.status === 200) {
+      window.location.href = "/dashboard";
+    } else {
+      setProcess({
+        ...process,
+        status: false,
+        processFor: "",
+      });
+      setError({
+        ...error,
+        status: true,
+        errFor: "login",
+        errMsg: response.isBoom
+          ? "Check your credentials"
+          : "Our authentication service is not working at the moment. Please try again later",
+      });
     }
-    setError({
-      ...error,
-      status: !response.status,
-      errMsg: !status ? data.output.payload.message : '',
-    });
   };
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        <FormField
-          control={form.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email</FormLabel>
-              <FormControl>
-                <Input placeholder="Enter your email address" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="password"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Password</FormLabel>
-              <FormControl>
-                <Input
-                  type="password"
-                  placeholder="Enter your password"
-                  {...field}
+    <section className="flex min-h-screen w-full items-center justify-center">
+      <div className="mx-auto flex w-[550px] flex-col p-5">
+        <Card>
+          <CardHeader>
+            <CardTitle>Log in to your account</CardTitle>
+            <CardDescription>Manage and Run your store</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+                <FormField
+                  control={form.control}
+                  name="id"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>ID</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter ID" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
 
-        {error.status && (
-          <Alert variant="destructive">
-            <AlertCircle className="size-4" />
-            <AlertTitle>Error!</AlertTitle>
-            <AlertDescription>{error.errMsg}</AlertDescription>
-          </Alert>
-        )}
-        <Button disabled={process} type="submit">
-          {process ? (
-            <>
-              <Loader2 className="mr-2 size-4 animate-spin" />
-              Processing...
-            </>
-          ) : (
-            'Login'
-          )}
-        </Button>
-      </form>
-    </Form>
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Password</FormLabel>
+                      <FormControl>
+                        <Input type={"password"} placeholder="Enter your password" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="alias"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Alias</FormLabel>
+                      <FormControl>
+                        <Input type={"text"} placeholder="Enter your alias" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {error.status && (
+                  <Alert variant="destructive">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertTitle>Error!</AlertTitle>
+                    <AlertDescription>{error.errMsg}</AlertDescription>
+                  </Alert>
+                )}
+                <Button disabled={process.status} type="submit">
+                  {process.status ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Processing...
+                    </>
+                  ) : (
+                    "Login"
+                  )}
+                </Button>
+              </form>
+            </Form>
+          </CardContent>
+        </Card>
+      </div>
+    </section>
   );
 }

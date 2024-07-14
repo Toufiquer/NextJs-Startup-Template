@@ -1,69 +1,56 @@
 /*
 |-----------------------------------------
-| setting up authentication route for the app
-| @author: Jahid Haque <jahid.haque@yahoo.com>
-| @copyright: daauk, 2024
-|-----------------------------------------
+| setting up Route for the App
+| @author: Toufiquer Rahman<toufiquer.0@gmail.com>
+| @copyright: Toufiquer, July, 2024
+|-------
+
 */
-
-import Boom from '@hapi/boom';
-import Crypto from 'crypto';
-import { getIronSession } from 'iron-session';
+import { NextRequest, NextResponse } from 'next/server';
+import { verifyRequestSource, validatePassword, generateJwt } from '@/utils/global';
 import { cookies } from 'next/headers';
-import { NextResponse } from 'next/server';
-
-import prisma from '@/libs/DB';
+import { getIronSession } from 'iron-session';
+import type { IronSession } from 'iron-session';
 import { sessionOptions } from '@/libs/session';
 
-const validatePassword = (
-  hashedPassword: string,
-  password: string,
-  salt: string,
-) => {
-  const hash = Crypto.pbkdf2Sync(password, salt, 1000, 128, 'sha512').toString(
-    'hex',
-  );
-  return hashedPassword === hash;
-};
 
-export async function POST(request: Request) {
-  const payload = await request.json();
-  const { email, password } = payload;
+export async function POST(req: NextRequest,res: NextResponse){
+  const session = await getIronSession(cookies(), sessionOptions);
+
+  const payload = await req.json();
 
   try {
-    const user = await prisma?.user.findUnique({
-      where: {
-        email,
-      },
-    });
+    const validSource = await verifyRequestSource(req);
 
-    if (user) {
-      if (validatePassword(user.password, password, user.salt)) {
-        const session = await getIronSession(cookies(), sessionOptions);
-        // @ts-ignore
-        session.user = user;
+    if (validSource) {
+      const request = await fetch(`${process.env.API}/auth/kitchenpad-login`, {
+        method: "POST",
+        body: JSON.stringify(payload),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const response = await request.json();
+
+      if (request.status === 200) {
+        const jwtPayload = {
+          mobile: payload.id,
+          alias: payload.alias,
+          token: response.content,
+          roles: 5,
+        };
+        session.data = jwtPayload;
         await session.save();
-
-        return NextResponse.json({
-          status: true,
-        });
+console.log(" response : ", JSON.stringify(response));
+        return NextResponse.json(jwtPayload, { status: 200 });
       }
 
-      return NextResponse.json({
-        data: Boom.badRequest('We do not like your credential. Please check'),
-        status: false,
-      });
+      return NextResponse.json({ error: 'Credentials did not work' }, { status: 400 });
     }
-    return NextResponse.json({
-      status: false,
-      data: Boom.badRequest('We do not like your credential. Please check'),
-    });
+
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   } catch (err) {
-    return NextResponse.json({
-      data: Boom.badRequest(
-        'Our authentication service is not working at the moment.',
-      ),
-      status: false,
-    });
+    console.error(err); // Log the error for debugging
+    return NextResponse.json({ error: 'Authentication service error' }, { status: 500 });
   }
 }
