@@ -5,26 +5,24 @@
 | @copyright: Toufiquer, July, 2024
 |-----------------------------------------
 */
+
+
 import { cookies } from "next/headers";
 import { redirect } from 'next/navigation'
 import { getIronSession } from "iron-session";
 
 import { sessionOptions } from "@/libs/session";
-import { generateLoginToken } from "@/service/auth";
-
-import LoginForm from "./login-form";
 
 export default async function Welcome() {
   const session = await getIronSession(cookies(), sessionOptions);
-  const requestToken = generateLoginToken();
- 
-  if (session && Object.keys(session).length > 0) {
-  redirect('/menu')
+
+  if (!session){
+  redirect('/sign-in')
   }
 
   return (
     <div className={"flex flex-col"}>
-      <LoginForm token={requestToken} />
+      <p>Menu page</p>
     </div>
   );
 }
