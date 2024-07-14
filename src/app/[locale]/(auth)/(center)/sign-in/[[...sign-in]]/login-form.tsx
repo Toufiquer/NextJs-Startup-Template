@@ -5,20 +5,25 @@
 | @copyright: mealnight, 2023
 |-----------------------------------------
 */
+
+
 "use client";
-import { useEffect, useState } from "react";
-import { zodResolver } from "@hookform/resolvers/zod";
+
+
+import * as z from "zod";
+import {  useState } from "react";
 import { useForm } from "react-hook-form";
 import { Loader2, AlertCircle } from "lucide-react";
-import * as z from "zod";
 
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { IError, IProcess } from "@/types/general";
-import { Button } from "@/components/ui/button";
+import { zodResolver } from "@hookform/resolvers/zod";
+
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { IError, IProcess } from "@/types/general";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 
 
 const formSchema = z.object({

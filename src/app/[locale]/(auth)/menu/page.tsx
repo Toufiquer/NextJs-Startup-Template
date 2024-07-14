@@ -15,8 +15,7 @@ import { sessionOptions } from "@/libs/session";
 
 export default async function Welcome() {
   const session = await getIronSession(cookies(), sessionOptions);
-
-  if (!session){
+  if (Object.keys(session).length === 0) {
   redirect('/sign-in')
   }
 

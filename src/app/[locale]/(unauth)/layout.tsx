@@ -41,7 +41,9 @@ export default function Layout(props: { children: React.ReactNode }) {
             >
               {t('portfolio_link')}
             </Link>
+          
           </li>
+
           <li>
             <a
               className="border-none text-gray-700 hover:text-gray-900"
@@ -50,6 +52,12 @@ export default function Layout(props: { children: React.ReactNode }) {
               GitHub
             </a>
           </li>
+          <li>  <Link
+              href="/menu"
+              className="border-none text-gray-700 hover:text-gray-900"
+            >
+             Menu
+            </Link></li>
         </>
       }
       rightNav={

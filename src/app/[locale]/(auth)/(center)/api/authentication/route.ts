@@ -6,12 +6,12 @@
 |-------
 
 */
-import { NextRequest, NextResponse } from 'next/server';
-import { verifyRequestSource, validatePassword, generateJwt } from '@/utils/global';
 import { cookies } from 'next/headers';
 import { getIronSession } from 'iron-session';
-import type { IronSession } from 'iron-session';
+import { NextRequest, NextResponse } from 'next/server';
+
 import { sessionOptions } from '@/libs/session';
+import { verifyRequestSource } from '@/utils/global';
 
 
 export async function POST(req: NextRequest,res: NextResponse){
@@ -40,10 +40,8 @@ export async function POST(req: NextRequest,res: NextResponse){
           roles: 5,
         };
         session.data = jwtPayload;
-        console.log('before save session : ', session);
         await session.save();
 
-console.log(" response : ", JSON.stringify(response));
         return NextResponse.json(jwtPayload, { status: 200 });
       }
 
